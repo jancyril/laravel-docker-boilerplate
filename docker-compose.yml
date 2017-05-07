@@ -1,0 +1,54 @@
+version: '2'
+services:
+  nginx:
+    image: jancyril/nginx:stable-alpine
+    ports:
+    - "80:80"
+    volumes:
+    - application/path:/var/www/html
+    networks:
+    - appnet
+  php:
+    image: jancyril/php:7.1
+    volumes:
+    - application/path:/var/www/html
+    networks:
+    - appnet
+  redis:
+    image: redis:alpine
+    networks:
+    - appnet
+  node:
+    image: jancyril/node:stable-alpine
+    volumes:
+    - application/path:/var/www/html
+    networks:
+    - appnet
+    tty: true
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: jcms
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+    volumes:
+    - data:/var/lib/mysql
+    networks:
+    - appnet
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+    - "8080:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: strongpassword
+      MYSQL_USER: jancyril
+      MYSQL_PASSWORD: secret
+    networks:
+    - appnet
+networks:
+  appnet:
+    driver: "bridge"
+volumes:
+  data:
+    driver: "local"

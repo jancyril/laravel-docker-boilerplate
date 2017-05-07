@@ -28,9 +28,9 @@ services:
   db:
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: jcms
-      MYSQL_USER: homestead
+      MYSQL_ROOT_PASSWORD: strongpassword
+      MYSQL_DATABASE: sample_database
+      MYSQL_USER: jancyril
       MYSQL_PASSWORD: secret
     volumes:
     - data:/var/lib/mysql

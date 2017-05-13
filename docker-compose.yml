@@ -18,6 +18,12 @@ services:
     image: redis:alpine
     networks:
     - appnet
+  supervisor:
+    image: jancyril/supervisor
+    volumes:
+    - application/path:/app
+    networks:
+    - appnet
   node:
     image: jancyril/node:stable-alpine
     volumes:

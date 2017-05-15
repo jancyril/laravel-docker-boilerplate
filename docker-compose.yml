@@ -9,7 +9,7 @@ services:
     networks:
     - appnet
   php:
-    image: jancyril/php:7.1
+    image: jancyril/php:7.1-fpm
     volumes:
     - application/path:/var/www/html
     networks:
@@ -18,8 +18,16 @@ services:
     image: redis:alpine
     networks:
     - appnet
+  beanstalkd:
+     image: jancyril/beanstalkd
+     networks:
+     - appnet
   supervisor:
     image: jancyril/supervisor
+    environment:
+      QUEUE_CONNECTION: beanstalkd
+      TRIES: 1
+      PROCESSES: 4
     volumes:
     - application/path:/app
     networks:
@@ -34,9 +42,9 @@ services:
   db:
     image: mariadb:latest
     environment:
-      MYSQL_ROOT_PASSWORD: strongpassword
-      MYSQL_DATABASE: sample_database
-      MYSQL_USER: jancyril
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: jcms
+      MYSQL_USER: homestead
       MYSQL_PASSWORD: secret
     volumes:
     - data:/var/lib/mysql
@@ -47,11 +55,25 @@ services:
     ports:
     - "8080:80"
     environment:
-      MYSQL_ROOT_PASSWORD: strongpassword
-      MYSQL_USER: jancyril
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: homestead
       MYSQL_PASSWORD: secret
     networks:
     - appnet
+  ungit:
+    image: jancyril/ungit
+    ports:
+      - "8448:8448"
+    environment:
+      GIT_AUTHOR_NAME:
+      GIT_AUTHOR_EMAIL:
+      GIT_COMMITTER_NAME:
+      GIT_COMMITTER_EMAIL:
+    volumes:
+      - application/path:/var/www
+      - ssh/path:/root/.ssh
+    networks:
+      - appnet
 networks:
   appnet:
     driver: "bridge"

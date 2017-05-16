@@ -1,19 +1,25 @@
 version: '2'
 services:
   nginx:
-    image: jancyril/nginx:stable-alpine
+    image: nginx:stable-alpine
     ports:
     - "80:80"
     volumes:
-    - application/path:/var/www/html
+    - /application/path:/var/www/html
+    - ./default.conf:/etc/nginx/conf.d/default.conf
     networks:
     - appnet
   php:
     image: jancyril/php:7.1-fpm
     volumes:
-    - application/path:/var/www/html
+    - /application/path:/var/www/html
     networks:
     - appnet
+  cli:
+    image: jancyril/php-cli
+    volumes:
+    - /application/path:/app
+    tty: true
   redis:
     image: redis:alpine
     networks:
@@ -25,17 +31,17 @@ services:
   supervisor:
     image: jancyril/supervisor
     environment:
-      QUEUE_CONNECTION: beanstalkd
       TRIES: 1
       PROCESSES: 4
     volumes:
-    - application/path:/app
+    - /application/path:/app
+    - ./supervisord.conf:/etc/supervisor/supervisord.conf
     networks:
     - appnet
   node:
     image: jancyril/node:stable-alpine
     volumes:
-    - application/path:/var/www/html
+    - /application/path:/var/www/html
     networks:
     - appnet
     tty: true
@@ -65,13 +71,13 @@ services:
     ports:
       - "8448:8448"
     environment:
-      GIT_AUTHOR_NAME:
-      GIT_AUTHOR_EMAIL:
-      GIT_COMMITTER_NAME:
-      GIT_COMMITTER_EMAIL:
+      GIT_AUTHOR_NAME: Jan Cyril Segubience
+      GIT_AUTHOR_EMAIL: jancyril@segubience.com
+      GIT_COMMITTER_NAME: Jan Cyril Segubience
+      GIT_COMMITTER_EMAIL: jancyril@segubience.com
     volumes:
-      - application/path:/var/www
-      - ssh/path:/root/.ssh
+      - /application/path:/var/www
+      - /ssh/path:/root/.ssh
     networks:
       - appnet
 networks:

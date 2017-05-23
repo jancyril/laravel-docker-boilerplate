@@ -1,71 +1,73 @@
-version: '2'
+version: '3'
 services:
   nginx:
     image: nginx:stable-alpine
     ports:
-    - "80:80"
+      - "80:80"
     volumes:
-    - /application/path:/var/www/html
-    - ./default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
     networks:
-    - appnet
+      - appnet
   php:
     image: jancyril/php:7.1-fpm
     volumes:
-    - /application/path:/var/www/html
+      - .:/var/www/html
     networks:
-    - appnet
+      - appnet
   cli:
     image: jancyril/php-cli
     volumes:
-    - /application/path:/app
+      - .:/app
+    networks:
+      - appnet
     tty: true
   redis:
     image: redis:alpine
     networks:
-    - appnet
+      - appnet
   beanstalkd:
      image: jancyril/beanstalkd
      networks:
-     - appnet
+      - appnet
   supervisor:
     image: jancyril/supervisor
     environment:
       TRIES: 1
       PROCESSES: 4
     volumes:
-    - /application/path:/app
-    - ./supervisord.conf:/etc/supervisor/supervisord.conf
+      - .:/app
+      - ./supervisord.conf:/etc/supervisor/supervisord.conf
     networks:
-    - appnet
+      - appnet
   node:
     image: jancyril/node:stable-alpine
     volumes:
-    - /application/path:/var/www/html
+      - .:/var/www/html
     networks:
-    - appnet
+      - appnet
     tty: true
   db:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: jcms
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: dbname
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     volumes:
-    - data:/var/lib/mysql
+      - data:/var/lib/mysql
     networks:
-    - appnet
+      - appnet
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     ports:
-    - "8080:80"
+      - "8080:80"
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
     networks:
-    - appnet
+      - appnet
   ungit:
     image: jancyril/ungit
     ports:
@@ -76,8 +78,8 @@ services:
       GIT_COMMITTER_NAME: Jan Cyril Segubience
       GIT_COMMITTER_EMAIL: jancyril@segubience.com
     volumes:
-      - /application/path:/var/www
-      - /ssh/path:/root/.ssh
+      - .:/var/www
+      - ssh/folder:/root/.ssh
     networks:
       - appnet
 networks:

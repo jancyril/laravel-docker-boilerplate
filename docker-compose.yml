@@ -41,7 +41,7 @@ services:
     networks:
       - appnet
   node:
-    image: jancyril/node:stable-alpine
+    image: jancyril/node:6-slim
     volumes:
       - .:/var/www/html
     networks:
@@ -51,9 +51,6 @@ services:
     image: mariadb:latest
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: dbname
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
     volumes:
       - data:/var/lib/mysql
     networks:
@@ -64,8 +61,6 @@ services:
       - "8080:80"
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
     networks:
       - appnet
   ungit:
